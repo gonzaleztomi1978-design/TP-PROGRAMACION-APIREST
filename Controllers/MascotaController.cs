@@ -107,6 +107,59 @@ public class MascotaController : ControllerBase
         return CreatedAtAction(nameof(ObtenerPorId), new { id = gato.Id }, gato);
     }
 
+    [HttpPut("{id}")]
+    public IActionResult Actualizar(int id, MascotaRequest datos)
+    {
+        Mascota mascota = BuscarPorId(id);
+
+        if (mascota == null)
+        {
+            return NotFound("No existe una mascota con el Id " + id + ".");
+        }
+
+        if (EstaVacio(datos.Nombre))
+        {
+            return BadRequest("El nombre es obligatorio.");
+        }
+
+        if (datos.Edad < 0)
+        {
+            return BadRequest("La edad no puede ser negativa.");
+        }
+
+        mascota.Nombre = datos.Nombre;
+        mascota.Edad = datos.Edad;
+
+        if (mascota is Perro && EstaVacio(datos.Raza) == false)
+        {
+            Perro perro = (Perro)mascota;
+            perro.Raza = datos.Raza;
+        }
+
+        if (mascota is Gato && EstaVacio(datos.Color) == false)
+        {
+            Gato gato = (Gato)mascota;
+            gato.Color = datos.Color;
+        }
+
+        return Ok(mascota);
+    }
+
+    [HttpDelete("{id}")]
+    public IActionResult Eliminar(int id)
+    {
+        Mascota mascota = BuscarPorId(id);
+
+        if (mascota == null)
+        {
+            return NotFound("No existe una mascota con el Id " + id + ".");
+        }
+
+        mascotas.Remove(mascota);
+
+        return NoContent();
+    }
+
     private Mascota BuscarPorId(int id)
     {
         foreach (Mascota mascota in mascotas)
