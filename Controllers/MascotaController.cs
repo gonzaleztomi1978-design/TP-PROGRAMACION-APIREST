@@ -15,6 +15,8 @@ public class MascotaController : ControllerBase
         new Gato { Id = 4, Nombre = "Michi", Edad = 10, Color = "Naranja" }
     };
 
+    private static int proximoId = 5;
+
     [HttpGet]
     public IActionResult ObtenerTodas()
     {
@@ -41,6 +43,70 @@ public class MascotaController : ControllerBase
         return Ok(mascota);
     }
 
+    [HttpPost("perro")]
+    public IActionResult AgregarPerro(MascotaRequest datos)
+    {
+        if (EstaVacio(datos.Nombre))
+        {
+            return BadRequest("El nombre es obligatorio.");
+        }
+
+        if (datos.Edad < 0)
+        {
+            return BadRequest("La edad no puede ser negativa.");
+        }
+
+        if (EstaVacio(datos.Raza))
+        {
+            return BadRequest("La raza es obligatoria.");
+        }
+
+        Perro perro = new Perro
+        {
+            Id = proximoId,
+            Nombre = datos.Nombre,
+            Edad = datos.Edad,
+            Raza = datos.Raza
+        };
+
+        mascotas.Add(perro);
+        proximoId = proximoId + 1;
+
+        return CreatedAtAction(nameof(ObtenerPorId), new { id = perro.Id }, perro);
+    }
+
+    [HttpPost("gato")]
+    public IActionResult AgregarGato(MascotaRequest datos)
+    {
+        if (EstaVacio(datos.Nombre))
+        {
+            return BadRequest("El nombre es obligatorio.");
+        }
+
+        if (datos.Edad < 0)
+        {
+            return BadRequest("La edad no puede ser negativa.");
+        }
+
+        if (EstaVacio(datos.Color))
+        {
+            return BadRequest("El color es obligatorio.");
+        }
+
+        Gato gato = new Gato
+        {
+            Id = proximoId,
+            Nombre = datos.Nombre,
+            Edad = datos.Edad,
+            Color = datos.Color
+        };
+
+        mascotas.Add(gato);
+        proximoId = proximoId + 1;
+
+        return CreatedAtAction(nameof(ObtenerPorId), new { id = gato.Id }, gato);
+    }
+
     private Mascota BuscarPorId(int id)
     {
         foreach (Mascota mascota in mascotas)
@@ -52,5 +118,20 @@ public class MascotaController : ControllerBase
         }
 
         return null;
+    }
+
+    private bool EstaVacio(string texto)
+    {
+        if (texto == null)
+        {
+            return true;
+        }
+
+        if (texto.Trim() == "")
+        {
+            return true;
+        }
+
+        return false;
     }
 }
