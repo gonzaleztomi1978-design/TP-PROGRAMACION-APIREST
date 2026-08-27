@@ -160,6 +160,55 @@ public class MascotaController : ControllerBase
         return NoContent();
     }
 
+    [HttpGet("mayores-a/{edad}")]
+    public IActionResult ObtenerMayoresA(int edad)
+    {
+        if (edad < 0)
+        {
+            return BadRequest("La edad no puede ser negativa.");
+        }
+
+        List<object> resultado = new List<object>();
+
+        foreach (Mascota mascota in mascotas)
+        {
+            if (mascota.Edad > edad)
+            {
+                resultado.Add(mascota);
+            }
+        }
+
+        return Ok(resultado);
+    }
+
+    [HttpGet("tipo/{tipo}")]
+    public IActionResult ObtenerPorTipo(string tipo)
+    {
+        string tipoBuscado = tipo.ToLower();
+
+        if (tipoBuscado != "perro" && tipoBuscado != "gato")
+        {
+            return BadRequest("El tipo debe ser 'perro' o 'gato'.");
+        }
+
+        List<object> resultado = new List<object>();
+
+        foreach (Mascota mascota in mascotas)
+        {
+            if (tipoBuscado == "perro" && mascota is Perro)
+            {
+                resultado.Add(mascota);
+            }
+
+            if (tipoBuscado == "gato" && mascota is Gato)
+            {
+                resultado.Add(mascota);
+            }
+        }
+
+        return Ok(resultado);
+    }
+
     private Mascota BuscarPorId(int id)
     {
         foreach (Mascota mascota in mascotas)
